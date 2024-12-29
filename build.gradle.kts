@@ -76,10 +76,10 @@ subprojects {
 	}
 
 	apply(plugin = "maven-publish")
-    apply(plugin = "signing")
+//    apply(plugin = "signing")
     apply(plugin = "kotlin")
 
-
+/*
     val signingSecretKeyRingFile = System.getenv("ORG_GRADLE_PROJECT_signingSecretKeyRingFile") ?: project.findProperty("signing.secretKeyRingFile")?.toString()
 
 // gpg --armor --export-secret-keys foobar@example.com | awk 'NR == 1 { print "signing.signingKey=" } 1' ORS='\\n'
@@ -95,7 +95,7 @@ subprojects {
             sign(project.extensions.getByType(PublishingExtension::class.java).publications)
         }
     }
-
+*/
     kotlin.sourceSets.main.configure {
         kotlin.srcDir(File(buildDir, "srcgen"))
     }
