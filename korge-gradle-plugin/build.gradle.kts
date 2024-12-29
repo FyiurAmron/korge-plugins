@@ -8,11 +8,11 @@ plugins {
 
 gradlePlugin {
     website = "https://korge.org/"
-    vcsUrl = "https://github.com/korlibs/korge-plugins"
+    vcsUrl = "https://github.com/FyiurAmron/korge-plugins"
 
 	plugins {
 		create("korge") {
-			id = "com.soywiz.korge"
+			id = "io.github.fyiuramron.korge"
 			displayName = "Korge"
 			description = "Multiplatform Game Engine for Kotlin"
 			implementationClass = "com.soywiz.korge.gradle.KorgeGradlePlugin"
