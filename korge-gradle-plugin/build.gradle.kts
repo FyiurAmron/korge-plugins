@@ -3,22 +3,20 @@ plugins {
 	`java-gradle-plugin`
 	kotlin("jvm")
 	`maven-publish`
-	id("com.gradle.plugin-publish")
-}
-
-pluginBundle {
-	website = "https://korge.soywiz.com/"
-	vcsUrl = "https://github.com/korlibs/korge-plugins"
-	tags = listOf("korge", "game", "engine", "game engine", "multiplatform", "kotlin")
+    id("com.gradle.plugin-publish") version "1.3.0"
 }
 
 gradlePlugin {
+    website = "https://korge.org/"
+    vcsUrl = "https://github.com/korlibs/korge-plugins"
+
 	plugins {
 		create("korge") {
 			id = "com.soywiz.korge"
 			displayName = "Korge"
 			description = "Multiplatform Game Engine for Kotlin"
 			implementationClass = "com.soywiz.korge.gradle.KorgeGradlePlugin"
+            tags = listOf("korge", "game", "engine", "game engine", "multiplatform", "kotlin")
 		}
 /*
         create("korge-android") {
@@ -29,14 +27,6 @@ gradlePlugin {
         }
  */
 	}
-}
-
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class).all {
-    kotlinOptions {
-        jvmTarget = "1.8"
-		//jvmTarget = "1.6"
-        apiVersion = "1.3" // https://youtrack.jetbrains.com/issue/KT-30330#focus=Comments-27-4542175.0-0
-    }
 }
 
 //val kotlinVersion: String by project

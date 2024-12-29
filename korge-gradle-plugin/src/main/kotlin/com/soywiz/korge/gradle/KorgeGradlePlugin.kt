@@ -26,7 +26,7 @@ class KorgeGradleApply(val project: Project) {
 
         logger.info("Korge Gradle plugin: ${BuildVersions.ALL}")
 
-        project.tasks.create("showKorgeVersions", Task::class.java) {
+        project.tasks.register("showKorgeVersions", Task::class.java) {
             it.doLast {
                 println("Build-time:")
                 for ((key, value) in mapOf(
@@ -36,7 +36,7 @@ class KorgeGradleApply(val project: Project) {
                     "java.version" to System.getProperty("java.version"),
                     "gradle.version" to GradleVersion.current(),
                     "groovy.version" to GroovySystem.getVersion(),
-                    "kotlin.version" to KotlinVersion.CURRENT,
+                    "kotlin.version" to KotlinVersion.DEFAULT,
                 )) {
                     println(" - $key: $value")
                 }

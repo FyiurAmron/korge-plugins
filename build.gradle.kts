@@ -1,12 +1,10 @@
 import java.util.*
 import java.io.*
 import java.nio.file.Files
-import kotlin.io.path.*
 
 plugins {
     idea
 	//id("com.moowork.node") version "1.3.1"
-	id("com.gradle.plugin-publish") version "0.12.0" apply false
     id("org.jetbrains.kotlin.jvm")
     //signing
     //`maven-publish`
@@ -97,7 +95,7 @@ subprojects {
     }
 */
     kotlin.sourceSets.main.configure {
-        kotlin.srcDir(File(buildDir, "srcgen"))
+        kotlin.srcDir(layout.buildDirectory.dir("srcgen"))
     }
 
 	//println("project: ${project.name}")
@@ -105,12 +103,12 @@ subprojects {
 	val sourceSets: SourceSetContainer by project
 	val publishing: PublishingExtension by project
 
-	val sourcesJar by tasks.creating(Jar::class) {
+	val sourcesJar by tasks.registering(Jar::class) {
 		archiveClassifier.set("sources")
 		from(sourceSets["main"].allSource)
 	}
 
-	val javadocJar by tasks.creating(Jar::class) {
+	val javadocJar by tasks.registering(Jar::class) {
 		archiveClassifier.set("javadoc")
 	}
 
@@ -122,10 +120,10 @@ subprojects {
 						username = sonatypePublishUser
 						password = sonatypePublishPassword
 					}
-                    if (version.toString().contains("-SNAPSHOT")) {
-                        url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+                    url = if (version.toString().contains("-SNAPSHOT")) {
+                        uri("https://oss.sonatype.org/content/repositories/snapshots/")
                     } else {
-                        url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                        uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
                     }
 				}
 			}
@@ -139,25 +137,27 @@ subprojects {
 				artifact(sourcesJar)
 				artifact(javadocJar)
 
+                fun Property<String>.setFromProject(propertyName: String) = this.set("" + project.property(propertyName))
+
 				pom {
-					name.set(project.name.toString())
-					description.set(project.property("project.description").toString())
-					url.set(project.property("project.scm.url").toString())
+					name.set(project.name)
+					description.setFromProject("project.description")
+					url.setFromProject("project.scm.url")
                     developers {
                         developer {
-                            id.set(project.property("project.author.id").toString())
-                            name.set(project.property("project.author.name").toString())
-                            email.set(project.property("project.author.email").toString())
+                            id.setFromProject("project.author.id")
+                            name.setFromProject("project.author.name")
+                            email.setFromProject("project.author.email")
                         }
                     }
                     licenses {
 						license {
-							name.set(project.property("project.license.name").toString())
-							url.set(project.property("project.license.url").toString())
+							name.setFromProject("project.license.name")
+							url.setFromProject("project.license.url")
 						}
 					}
 					scm {
-						url.set(project.property("project.scm.url").toString())
+						url.setFromProject("project.scm.url")
 					}
 				}
 			}
@@ -165,7 +165,7 @@ subprojects {
 	}
 }
 
-tasks.create("externalReleaseMavenCentral", GradleBuild::class.java) {
+tasks.register("externalReleaseMavenCentral", GradleBuild::class.java) {
     val task = this
     task.tasks = listOf("releaseMavenCentral")
     var tempDir: File? = null

@@ -39,7 +39,7 @@ fun Project.configureJvm() {
 		project.afterEvaluate {
 			val beforeJava9 = System.getProperty("java.version").startsWith("1.")
 		    if (!beforeJava9) task.jvmArgs("--add-opens=java.desktop/sun.java2d.opengl=ALL-UNNAMED")
-			task.main = korge.realJvmMainClassName
+			task.mainClass.set(korge.realJvmMainClassName)
 		}
 	}
 
@@ -48,14 +48,13 @@ fun Project.configureJvm() {
 			project.addTask<KorgeJavaExec>("runJvm${entry.name.capitalize()}", group = GROUP_KORGE) { task ->
 				group = GROUP_KORGE_RUN
 				dependsOn("jvmMainClasses")
-				task.main = entry.jvmMainClassName
+				task.mainClass.set(entry.jvmMainClassName)
 			}
 		}
 	}
 
 	for (jvmJar in project.getTasksByName("jvmJar", true)) {
-		val jvmJar = (jvmJar as Jar)
-		jvmJar.apply {
+        (jvmJar as Jar).apply {
 			entryCompression = ZipEntryCompression.STORED
 		}
 	}
@@ -151,8 +150,8 @@ open class PatchedProGuardTask : ProGuardTask() {
 
 private fun Project.addProguard() {
 	// packageJvmFatJar
-	val packageJvmFatJar = project.addTask<org.gradle.jvm.tasks.Jar>("packageJvmFatJar", group = GROUP_KORGE) { task ->
-		task.baseName = "${project.name}-all"
+	val packageJvmFatJar = project.addTask<Jar>("packageJvmFatJar", group = GROUP_KORGE) { task ->
+		task.archiveBaseName.set("${project.name}-all")
 		task.group = GROUP_KORGE_PACKAGE
 		task.exclude(
 			"com/sun/jna/aix-ppc/**",
@@ -211,7 +210,7 @@ private fun Project.addProguard() {
 			})
 			//println(packageJvmFatJar.outputs.files.toList())
 			task.injars(packageJvmFatJar.outputs.files.toList())
-			task.outjars(buildDir["/libs/${project.name}-all-proguard.jar"])
+			task.outjars(layout.buildDirectory["/libs/${project.name}-all-proguard.jar"])
 			task.dontwarn()
 			task.ignorewarnings()
 			if (!project.korge.proguardObfuscate) {
@@ -232,8 +231,8 @@ private fun Project.addProguard() {
 			task.keep("class ${project.korge.realJvmMainClassName} { *; }")
 			task.keep("class org.jcodec.** { *; }")
 
-			if (runJvm.main?.isNotBlank() == true) {
-				task.keep("""public class ${runJvm.main} { public static void main(java.lang.String[]); }""")
+			if (runJvm.mainClass.get().isNotBlank()) {
+				task.keep("""public class ${runJvm.mainClass.get()} { public static void main(java.lang.String[]); }""")
 			}
 		}
 
